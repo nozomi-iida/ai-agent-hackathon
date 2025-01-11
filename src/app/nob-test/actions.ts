@@ -1,14 +1,11 @@
 'use server';
 
-import { defaultModel } from '@/libs/generative-ai/client';
+import { jsonModal } from '@/libs/generative-ai/client';
 
-export const action = async () => {
-  const prompt = `List a few popular cookie recipes using this JSON schema:
+export const askRecipe = async (prevState: Recipe[], formData: FormData) => {
+  const prompt = formData.get('prompt') as string;
 
-Recipe = {'recipeName': string}
-Return: Array<Recipe>`;
+  const result = await jsonModal.generateContent(prompt);
 
-  const result = await defaultModel.generateContent(prompt);
-  console.log(result.response);
-  console.log(result.response.text());
+  return JSON.parse(result.response.text()) as Recipe[];
 };

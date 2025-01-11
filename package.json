@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-cloud/speech": "^6.7.0",
+    "@google-cloud/text-to-speech": "^5.7.0",
     "@google-cloud/vertexai": "^1.9.2",
     "@google/generative-ai": "^0.21.0",
     "next": "15.1.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-media-recorder": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

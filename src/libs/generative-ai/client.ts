@@ -14,12 +14,6 @@ const controlFunctionDeclaration: FunctionDeclaration = {
 	parameters: {},
 } as FunctionDeclaration;
 
-const functions = {
-	generateId: () => {
-		return Math.floor(Math.random() * 1000);
-	},
-};
-
 export const defaultModel = genAI.getGenerativeModel({
 	model: "gemini-1.5-flash",
 	tools: [{ functionDeclarations: [controlFunctionDeclaration] }],

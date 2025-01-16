@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import './globals.css';
 import { ThemeProvider } from '@/components/ui/theme-provider';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -15,13 +16,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body>
+      <body className="mx-auto flex min-h-svh max-w-xl flex-col items-center justify-center border-x border-zinc-700">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <header className="flex w-full justify-end p-2">
+            <ModeToggle />
+          </header>
           {children}
         </ThemeProvider>
       </body>

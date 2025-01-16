@@ -16,6 +16,47 @@ const textToSpeechClient = new TextToSpeechClient({
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+const chat = model.startChat({history: []})
+
+export async function startTest () {
+  const prompt = `
+あなたはIELTSスピーキングテストの試験官です。
+私の英文の発言に対して、以下のフォーマットで1回に1つずつ回答します。
+
+#出力項目
+私の発言に相槌を打つ短文を1つ書いて。そのあと、私への質問となる短文を1つ。
+あなたのの立場を守って書いてください。lang:en
+
+#出力フォーマット
+英語で書いて
+普通の文章で書いて
+
+#絶対的な制約
+毎回、必ず上記の出力フォーマットを厳格に守って全てを必ず出力してください。
+
+#会話の開始
+私にIELTSのスピーキングテストの質問をしてください。
+`
+
+  const result = await chat.sendMessage(prompt);
+  console.log(await chat.getHistory());
+  
+  const aiResponse = result.response.text() || "申し訳ありません。応答を生成できませんでした。";
+
+  const [audioResponse] = await textToSpeechClient.synthesizeSpeech({
+    input: { text: aiResponse },
+    voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
+    audioConfig: { 
+      audioEncoding: 'MP3',
+      speakingRate: 1.0
+    },
+  });
+
+  return {
+    aiResponse: aiResponse,
+    audioContent: Buffer.from(audioResponse.audioContent as Uint8Array).toString('base64'),
+  };
+}
 
 export async function startRecording(audioBlob: Blob) {
   // Convert audio blob to base64
@@ -29,7 +70,7 @@ export async function startRecording(audioBlob: Blob) {
   const config = {
     encoding: 'WEBM_OPUS' as const,
     sampleRateHertz: 48000,
-    languageCode: 'ja-JP',
+    languageCode: 'en-US',
   };
   const request = {
     audio: audio,
@@ -43,20 +84,17 @@ export async function startRecording(audioBlob: Blob) {
     .join('\n') || '';
 
   // Get AI response using Gemini
-  const prompt = `あなたは親切で役立つAIアシスタントです。以下のユーザーの質問に対して、簡潔で分かりやすい日本語で回答してください：
+  const prompt = `${transcription}`;
 
-${transcription}`;
-
-  const result = await model.generateContent(prompt);
+  const result = await chat.sendMessage(prompt);
   const aiResponse = result.response.text() || "申し訳ありません。応答を生成できませんでした。";
-
   // Convert AI response to speech
   const [audioResponse] = await textToSpeechClient.synthesizeSpeech({
     input: { text: aiResponse },
-    voice: { languageCode: 'ja-JP', ssmlGender: 'NEUTRAL' },
+    voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
     audioConfig: { 
       audioEncoding: 'MP3',
-      speakingRate: 1.3
+      speakingRate: 1.0
     },
   });
 

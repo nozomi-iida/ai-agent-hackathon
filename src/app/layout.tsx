@@ -1,12 +1,6 @@
 import type { Metadata } from 'next';
 
 import './globals.css';
-import '@mantine/core/styles.css';
-import {
-  ColorSchemeScript,
-  mantineHtmlProps,
-  MantineProvider,
-} from '@mantine/core';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -19,12 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript defaultColorScheme="dark" />
-      </head>
-      <body className="mx-auto max-w-xl flex flex-col items-center justify-center min-h-svh border-x border-zinc-700">
-        <MantineProvider defaultColorScheme="dark">{children}</MantineProvider>
+    <html lang="ja">
+      <body className="mx-auto flex min-h-svh max-w-xl flex-col items-center justify-center border-x border-zinc-700">
+        {children}
       </body>
     </html>
   );

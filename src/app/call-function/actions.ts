@@ -1,22 +1,22 @@
-"use server";
+'use server';
 
-import { jsonModal } from "@/libs/generative-ai/client";
+import { jsonModal } from '@/libs/generative-ai/client';
 
 export const askRecipe = async (prevState: Recipe[], formData: FormData) => {
-	const prompt = formData.get("prompt") as string;
+  const prompt = formData.get('prompt') as string;
 
-	const result = await jsonModal.generateContent(prompt);
+  const result = await jsonModal.generateContent(prompt);
 
-	return JSON.parse(result.response.text()) as Recipe[];
+  return JSON.parse(result.response.text()) as Recipe[];
 };
 
 export const getRecommendBars = async (
-	prevState: Recipe[],
-	formData: FormData,
+  prevState: Recipe[],
+  formData: FormData,
 ) => {
-	const prompt = formData.get("prompt") as string;
+  const prompt = formData.get('prompt') as string;
 
-	const result = await jsonModal.generateContent(prompt);
+  const result = await jsonModal.generateContent(prompt);
 
-	return JSON.parse(result.response.text()) as Recipe[];
+  return JSON.parse(result.response.text()) as Recipe[];
 };

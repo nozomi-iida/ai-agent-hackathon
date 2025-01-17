@@ -16,18 +16,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className="mx-auto flex min-h-svh max-w-xl flex-col items-center justify-center border-x border-zinc-700">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <header className="flex w-full justify-end p-2">
-            <ModeToggle />
-          </header>
-          {children}
-        </ThemeProvider>
+      <body className="">
+        <div className="mx-auto max-w-xl border-x border-zinc-700">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <header className="flex w-full items-center justify-between border-b border-zinc-700 p-2">
+              <div className="size-10" />
+              <h1 className="text-xl font-bold">taik mate</h1>
+              <ModeToggle />
+            </header>
+            <main className="flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center">
+              {children}
+            </main>
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { startRecording, startTest } from './actions';
+import { startRecording, startTest, translateText } from './actions';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/libs/classNames';
 
@@ -84,6 +84,12 @@ export default function ConversationPage() {
     }
   };
 
+  const onTranslate = async (text: string) => {
+    await translateText(text);
+
+    console.log('Translated:', text);
+  };
+
   return (
     <div className="flex-grow p-4">
       <h1 className="mb-4 text-center text-2xl font-bold">AI Conversation</h1>
@@ -136,6 +142,12 @@ export default function ConversationPage() {
             >
               {message.content}
             </p>
+            <Button
+              variant="secondary"
+              onClick={() => onTranslate(message.content)}
+            >
+              翻訳
+            </Button>
           </div>
         ))}
       </div>

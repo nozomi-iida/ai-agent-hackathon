@@ -1,5 +1,6 @@
 "use server";
 
+import { translate } from "@/libs/google-cloud/translate";
 import { SpeechClient } from "@google-cloud/speech";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -115,3 +116,13 @@ export async function startRecording(audioBlob: Blob) {
 		).toString("base64"),
 	};
 }
+
+export const translateText = async (text: string) => {
+	/* 英語を日本語に翻訳する */
+	const result = await translate.translate(text, "ja");
+	const translations = Array.isArray(result) ? result : [result];
+
+	console.log(translations);
+
+	return translations as string[];
+};

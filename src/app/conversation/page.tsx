@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { startRecording, startTest } from './actions';
+import { calculateScore, startRecording, startTest } from './actions';
 import { Button } from '@/components/ui/button';
 
 export default function ConversationPage() {
@@ -11,6 +11,7 @@ export default function ConversationPage() {
   >([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTestStarted, setIsTestStarted] = useState(false);
+  const [result, setResult] = useState('');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const handleStartTest = async () => {
@@ -83,14 +84,22 @@ export default function ConversationPage() {
     }
   };
 
+  const handleCalculateScore = async () => {
+    setIsTestStarted(false);
+    const response = await calculateScore();
+    setResult(response.aiResponse);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-4 text-2xl font-bold">AI Conversation</h1>
 
-      <div>
-        <Button onClick={handleStartTest} disabled={isTestStarted}>
-          スタート
-        </Button>
+      <div className="mb-4">
+        {isTestStarted ? (
+          <Button onClick={handleCalculateScore}>テスト完了</Button>
+        ) : (
+          <Button onClick={handleStartTest}>スタート</Button>
+        )}
       </div>
       <div className="mb-4">
         <button
@@ -118,6 +127,12 @@ export default function ConversationPage() {
           </div>
         ))}
       </div>
+      {result && (
+        <div className="mt-4 rounded-lg p-4 bg-gray-100">
+          <h2 className="text-xl font-bold mb-2">Result</h2>
+          <p className="whitespace-pre-wrap">{result}</p>
+        </div>
+      )}
     </div>
   );
 }

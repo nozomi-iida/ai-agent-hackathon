@@ -18,21 +18,26 @@ export default function ConversationPage() {
   const [isTestStarted, setIsTestStarted] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const handleStartTest = async () => {
-    setIsTestStarted(true);
-    const response = await startTest();
-    setConversation((prev) => [
-      ...prev,
-      { role: 'ai', content: response.aiResponse },
-    ]);
+  const playAudio = async (content: string) => {
     const audioContext = new AudioContext();
     const audioBuffer = await audioContext.decodeAudioData(
-      Buffer.from(response.audioContent, 'base64').buffer,
+      Buffer.from(content, 'base64').buffer,
     );
     const source = audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(audioContext.destination);
     source.start(0);
+  }
+
+  const addConversation = (role: 'user' | 'ai', content: string) => {
+    setConversation((prev) => [...prev, { role, content }]);
+  }
+
+  const handleStartTest = async () => {
+    setIsTestStarted(true);
+    const response = await startTest();
+    addConversation('ai', response.aiResponse);
+    playAudio(response.audioContent);
   };
 
   const handleStartRecording = async () => {
@@ -50,25 +55,9 @@ export default function ConversationPage() {
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
         const response = await startRecording(audioBlob);
 
-        setConversation((prev) => [
-          ...prev,
-          { role: 'user', content: response.text },
-        ]);
-
-        setConversation((prev) => [
-          ...prev,
-          { role: 'ai', content: response.aiResponse },
-        ]);
-
-        const audioContext = new AudioContext();
-        const audioBuffer = await audioContext.decodeAudioData(
-          Buffer.from(response.audioContent, 'base64').buffer,
-        );
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
-        source.start(0);
-
+        addConversation('user', response.aiResponse);
+        addConversation('ai', response.aiResponse);
+        playAudio(response.audioContent);
         setIsProcessing(false);
       };
 

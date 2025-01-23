@@ -4,6 +4,10 @@ import { useState, useRef } from 'react';
 import { startRecording, startTest, translateText } from './actions';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/libs/classNames';
+import { Progress } from '@/components/ui/progress';
+import { BsFillMicFill } from 'react-icons/bs';
+import { MdGTranslate } from 'react-icons/md';
+import { FaPlay } from 'react-icons/fa6';
 
 export default function ConversationPage() {
   const [isRecording, setIsRecording] = useState(false);
@@ -84,73 +88,103 @@ export default function ConversationPage() {
     }
   };
 
-  const onTranslate = async (text: string) => {
-    const result = await translateText(text);
+  const [translates, setTranslates] = useState<string[]>([]);
 
-    console.log('Translated:', result);
+  const onTranslate = async (index: number, text: string) => {
+    const result = await translateText(text);
+    const newTranslates = [...translates];
+    newTranslates[index] = result;
+    setTranslates(newTranslates);
   };
 
   return (
-    <div className="flex-grow p-4">
-      <h1 className="mb-4 text-center text-2xl font-bold">AI Conversation</h1>
-      <div className="flex justify-center space-x-4">
-        <Button
-          variant="secondary"
-          onClick={handleStartTest}
-          disabled={isTestStarted}
-        >
-          スタート
-        </Button>
+    <div className="relative flex w-full flex-grow flex-col pb-20">
+      <Progress className="h-2 rounded-none [&>div]:bg-blue-500" value={33} />
+      <h1 className="mb-4 py-4 text-center text-2xl font-bold">Lesson</h1>
+
+      <div
+        className={cn(
+          'flex flex-grow flex-col',
+          conversation.length === 0 ? 'items-center justify-center' : 'p-4',
+        )}
+      >
+        {conversation.length > 0 ? (
+          <div className="space-y-2">
+            {conversation.map((message, index) => (
+              <div key={index}>
+                <div
+                  className={cn(
+                    'py-1 text-xs text-zinc-500 dark:text-zinc-400',
+                    message.role === 'ai' ? 'text-left' : 'text-right',
+                  )}
+                >
+                  {message.role === 'ai' ? 'interviewer' : 'you'}
+                </div>
+                <div
+                  className={cn(
+                    'space-y-2 whitespace-pre-wrap rounded-t-2xl border p-4',
+                    message.role === 'ai'
+                      ? 'w-fit rounded-br-2xl text-left'
+                      : 'ml-auto w-fit rounded-bl-2xl text-right',
+                  )}
+                >
+                  <p>{message.content}</p>
+                  {message.role === 'ai' && (
+                    <div className="flex justify-end gap-x-3">
+                      <Button
+                        className="rounded-full bg-blue-600 [&_svg]:size-5"
+                        size="icon"
+                        variant="secondary"
+                        onClick={() => onTranslate(index, message.content)}
+                      >
+                        <MdGTranslate className="fill-white" />
+                      </Button>
+                      <Button
+                        className="rounded-full"
+                        size="icon"
+                        variant="secondary"
+                      >
+                        <FaPlay className="fill-white pl-1" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !isTestStarted ? (
+          <div className="mx-auto w-fit">
+            <Button
+              size="lg"
+              onClick={handleStartTest}
+              disabled={isTestStarted}
+            >
+              スタート
+            </Button>
+          </div>
+        ) : (
+          <div className="animate-pulse">Waiting...</div>
+        )}
+      </div>
+
+      <div className="fixed bottom-0 left-0 flex w-full justify-center space-x-4 border-t p-4">
         <Button
           type="button"
           onClick={isRecording ? handleStopRecording : handleStartRecording}
-          disabled={isProcessing}
+          variant={isRecording ? 'destructive' : 'default'}
+          disabled={!isTestStarted || isProcessing}
           className={cn(
             'rounded px-4 py-2',
-            isRecording
-              ? 'bg-red-500 hover:bg-red-600'
-              : 'bg-blue-500 hover:bg-blue-600',
             isProcessing ? 'cursor-not-allowed opacity-50' : '',
           )}
         >
+          {isRecording && <BsFillMicFill />}
           {isProcessing
             ? 'Processing...'
             : isRecording
               ? 'Stop Recording'
               : 'Start Recording'}
         </Button>
-      </div>
-
-      <div className="space-y-2">
-        {conversation.map((message, index) => (
-          <div key={index}>
-            <div
-              className={cn(
-                'py-1 text-xs text-zinc-500 dark:text-zinc-400',
-                message.role === 'ai' ? 'text-left' : 'text-right',
-              )}
-            >
-              {message.role === 'ai' ? 'interviewer' : 'you'}
-            </div>
-            <p
-              className={cn(
-                'whitespace-pre-wrap rounded-t-2xl border p-4',
-                message.role === 'ai'
-                  ? 'w-fit rounded-br-2xl text-left'
-                  : 'ml-auto w-fit rounded-bl-2xl text-right',
-              )}
-            >
-              {message.content}
-            </p>
-
-            <Button
-              variant="secondary"
-              onClick={() => onTranslate(message.content)}
-            >
-              翻訳
-            </Button>
-          </div>
-        ))}
       </div>
     </div>
   );

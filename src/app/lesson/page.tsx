@@ -129,6 +129,11 @@ export default function ConversationPage() {
                   )}
                 >
                   <p>{message.content}</p>
+                  {translates[index] && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {translates[index]}
+                    </p>
+                  )}
                   {message.role === 'ai' && (
                     <div className="flex justify-end gap-x-3">
                       <Button

@@ -85,9 +85,9 @@ export default function ConversationPage() {
   };
 
   const onTranslate = async (text: string) => {
-    await translateText(text);
+    const result = await translateText(text);
 
-    console.log('Translated:', text);
+    console.log('Translated:', result);
   };
 
   return (
@@ -142,6 +142,7 @@ export default function ConversationPage() {
             >
               {message.content}
             </p>
+
             <Button
               variant="secondary"
               onClick={() => onTranslate(message.content)}

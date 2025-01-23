@@ -25,22 +25,13 @@ const chat = model.startChat({ history: [] });
 
 export async function startTest() {
 	const prompt = `
-あなたはIELTSスピーキングテストの試験官です。
-私の英文の発言に対して、以下のフォーマットで1回に1つずつ回答します。
+あなたは、英会話学習用の話相手です。
+私の英文の発言に対して、以下の必ず条件で回答します。
 
-#出力項目
-私の発言に相槌を打つ短文を1つ書いて。そのあと、私への質問となる短文を1つ。
-あなたのの立場を守って書いてください。lang:en
-
-#出力フォーマット
-英語で書いて
-普通の文章で書いて
-
-#絶対的な制約
-毎回、必ず上記の出力フォーマットを厳格に守って全てを必ず出力してください。
-
-#会話の開始
-私にIELTSのスピーキングテストの質問をしてください。
+- 10〜20 単語程度の英文で回答してください。
+- あなたの回答には、私の発言に対する相槌を含めてください。
+- あなたの回答には、私に対する質問を含めてください。
+- あなたの回答には、あなたの立場を守って書いてください。
 `;
 
 	const result = await chat.sendMessage(prompt);
@@ -122,7 +113,5 @@ export const translateText = async (text: string) => {
 	const result = await translate.translate(text, "ja");
 	const translations = Array.isArray(result) ? result : [result];
 
-	console.log(translations);
-
-	return translations as string[];
+	return translations[0];
 };

@@ -1,21 +1,40 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { startRecording, startTest, translateText } from './actions';
+import {
+  calculateScore,
+  startRecording,
+  startTest,
+  translateText,
+} from './actions';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/libs/classNames';
 import { Progress } from '@/components/ui/progress';
 import { BsFillMicFill } from 'react-icons/bs';
 import { MdGTranslate } from 'react-icons/md';
 import { FaPlay } from 'react-icons/fa6';
+import {
+  Dialog,
+  DialogHeader,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogClose,
+} from '@/components/ui/dialog';
+
+const ANSWER_COUNT = 2;
 
 export default function ConversationPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [conversation, setConversation] = useState<
     { role: 'user' | 'ai'; content: string }[]
   >([]);
+  const answerCount = conversation.filter(
+    (message) => message.role === 'user',
+  ).length;
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTestStarted, setIsTestStarted] = useState(false);
+  const [result, setResult] = useState('');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const playAudio = async (content: string) => {
@@ -27,11 +46,11 @@ export default function ConversationPage() {
     source.buffer = audioBuffer;
     source.connect(audioContext.destination);
     source.start(0);
-  }
+  };
 
   const addConversation = (role: 'user' | 'ai', content: string) => {
     setConversation((prev) => [...prev, { role, content }]);
-  }
+  };
 
   const handleStartTest = async () => {
     setIsTestStarted(true);
@@ -55,9 +74,14 @@ export default function ConversationPage() {
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
         const response = await startRecording(audioBlob);
 
-        addConversation('user', response.aiResponse);
-        addConversation('ai', response.aiResponse);
-        playAudio(response.audioContent);
+        addConversation('user', response.text);
+        if (answerCount + 1 === ANSWER_COUNT) {
+          const score = await calculateScore();
+          setResult(score.aiResponse);
+        } else {
+          addConversation('ai', response.aiResponse);
+          playAudio(response.audioContent);
+        }
         setIsProcessing(false);
       };
 
@@ -86,9 +110,22 @@ export default function ConversationPage() {
     setTranslates(newTranslates);
   };
 
+  const handleResetConversation = async () => {
+    const res = await calculateScore();
+    setResult(res.aiResponse);
+    setConversation([]);
+    setIsTestStarted(false);
+    setResult('');
+    setTranslates([]);
+    setIsRecording(false);
+  };
+
   return (
-    <div className="relative flex w-full grow flex-col pb-20">
-      <Progress className="h-2 rounded-none [&>div]:bg-blue-500" value={33} />
+    <div className="relative flex w-full flex-grow flex-col pb-20">
+      <Progress
+        className="h-2 rounded-none [&>div]:bg-blue-500"
+        value={(answerCount / ANSWER_COUNT) * 100}
+      />
       <h1 className="mb-4 py-4 text-center text-2xl font-bold">Lesson</h1>
 
       <div
@@ -180,6 +217,24 @@ export default function ConversationPage() {
               : 'Start Recording'}
         </Button>
       </div>
+      <Dialog
+        open={answerCount === ANSWER_COUNT}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            handleResetConversation();
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogTitle>採点</DialogTitle>
+          <DialogHeader>
+            <DialogDescription className="whitespace-pre-wrap">
+              {result}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogClose />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

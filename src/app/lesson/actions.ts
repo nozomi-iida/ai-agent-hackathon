@@ -41,13 +41,9 @@ export async function startTest() {
 あなたはIELTSスピーキングテストの試験官です。
 私の英文の発言に対して、以下のフォーマットで1回に1つずつ回答します。
 
-  const aiResponse =
-    result.response.text() || '申し訳ありません。応答を生成できませんでした。';
-
 #出力フォーマット
-英語で書いて
-アスタリスクはつけないで
-普通の文章で書いて
+英語
+アスタリスクはつけない
 
 #会話の開始
 私にIELTSのスピーキングテストの質問をしてください。
@@ -109,6 +105,7 @@ export async function startRecording(audioBlob: Blob) {
 }
 
 export async function calculateScore() {
+  const history = await chat.getHistory();
   const prompt = `
 IELTSのスピーキングテストはこれで終了になります。
 
@@ -195,7 +192,12 @@ IELTSのスピーキングテストはこれで終了になります。
 毎回、必ず上記の出力フォーマットを厳格に守って全てを必ず出力してください。
 `;
 
-  const result = await chat.sendMessage(prompt);
+  const result = await model.generateContent([
+    ...history
+      .flatMap((message) => message.parts.flatMap((part) => part.text))
+      .join('\n'),
+    prompt,
+  ]);
   const aiResponse =
     result.response.text() || '申し訳ありません。応答を生成できませんでした。';
   await model.startChat({ history: [] });

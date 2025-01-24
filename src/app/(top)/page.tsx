@@ -24,7 +24,7 @@ export default function Page() {
           size="lg"
           asChild
         >
-          <Link href="/lesson">むちゃぶり MODE</Link>
+          <Link href="/muchaburi">むちゃぶり MODE</Link>
         </Button>
         <Button
           className="w-full rounded-full bg-sky-700 text-white hover:bg-sky-800"

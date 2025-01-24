@@ -98,13 +98,13 @@ export default function ConversationPage() {
   };
 
   return (
-    <div className="relative flex w-full flex-grow flex-col pb-20">
+    <div className="relative flex w-full grow flex-col pb-20">
       <Progress className="h-2 rounded-none [&>div]:bg-blue-500" value={33} />
       <h1 className="mb-4 py-4 text-center text-2xl font-bold">Lesson</h1>
 
       <div
         className={cn(
-          'flex flex-grow flex-col',
+          'flex grow flex-col',
           conversation.length === 0 ? 'items-center justify-center' : 'p-4',
         )}
       >

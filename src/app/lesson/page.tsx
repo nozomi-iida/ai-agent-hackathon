@@ -122,7 +122,7 @@ export default function ConversationPage() {
                 </div>
                 <div
                   className={cn(
-                    'space-y-2 whitespace-pre-wrap rounded-t-2xl border p-4',
+                    'space-y-2 rounded-t-2xl border p-4 whitespace-pre-wrap',
                     message.role === 'ai'
                       ? 'w-fit rounded-br-2xl text-left'
                       : 'ml-auto w-fit rounded-bl-2xl text-right',

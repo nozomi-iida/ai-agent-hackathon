@@ -43,7 +43,7 @@ export async function startTest() {
 
 #出力フォーマット
 英語
-アスタリスクはつけない
+アスタリスク(*)は絶対につけない
 
 #会話の開始
 私にIELTSのスピーキングテストの質問をしてください。
@@ -212,4 +212,11 @@ export const translateText = async (text: string) => {
   const translations = Array.isArray(result) ? result : [result];
 
   return translations[0];
+};
+
+export const textToAudioContent = async (text: string) => {
+  const audioResponse = await textToSpeak(text);
+  return Buffer.from(audioResponse.audioContent as Uint8Array).toString(
+    'base64',
+  );
 };

@@ -5,6 +5,7 @@ import {
   calculateScore,
   startRecording,
   startTest,
+  textToAudioContent,
   translateText,
 } from './actions';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 
-const ANSWER_COUNT = 10;
+const ANSWER_COUNT = 7;
 
 export default function ConversationPage() {
   const [isRecording, setIsRecording] = useState(false);
@@ -80,7 +81,7 @@ export default function ConversationPage() {
           setResult(score.aiResponse);
         } else {
           addConversation('ai', response.aiResponse);
-          playAudio(response.audioContent);
+          await playAudio(response.audioContent);
         }
         setIsProcessing(false);
       };
@@ -118,6 +119,11 @@ export default function ConversationPage() {
     setResult('');
     setTranslates([]);
     setIsRecording(false);
+  };
+
+  const handleReplyAudio = async (content: string) => {
+    const audioContent = await textToAudioContent(content);
+    await playAudio(audioContent);
   };
 
   return (
@@ -163,17 +169,17 @@ export default function ConversationPage() {
                   {message.role === 'ai' && (
                     <div className="flex justify-end gap-x-3">
                       <Button
-                        className="rounded-full bg-blue-600 [&_svg]:size-5"
                         size="icon"
-                        variant="secondary"
+                        variant="blue"
                         onClick={() => onTranslate(index, message.content)}
+                        disabled={translates[index] !== undefined}
                       >
                         <MdGTranslate className="fill-white" />
                       </Button>
                       <Button
                         className="rounded-full"
                         size="icon"
-                        variant="secondary"
+                        onClick={() => handleReplyAudio(message.content)}
                       >
                         <FaPlay className="fill-white pl-1" />
                       </Button>

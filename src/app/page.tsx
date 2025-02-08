@@ -86,6 +86,7 @@ export default function ConversationPage() {
         } else {
           addConversation('ai', response.aiResponse);
           await playAudio(response.audioContent);
+          window.scrollTo(0, document.body.scrollHeight);
         }
         setIsProcessing(false);
       };

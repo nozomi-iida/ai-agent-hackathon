@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   calculateScore,
   startRecording,
@@ -130,6 +130,20 @@ export default function ConversationPage() {
     const audioContent = await textToAudioContent(content);
     await playAudio(audioContent);
   };
+
+  /* Chat時に常に下にスクロールするようにbodyを監視 */
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          const node = mutation.addedNodes[0] as HTMLElement;
+          node.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+    observer.observe(document.body, { childList: true });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="relative flex w-full flex-grow flex-col pb-20">

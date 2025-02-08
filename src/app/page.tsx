@@ -11,9 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/libs/classNames';
 import { Progress } from '@/components/ui/progress';
-import { BsFillMicFill } from 'react-icons/bs';
 import { MdGTranslate } from 'react-icons/md';
-import { FaPlay } from 'react-icons/fa6';
+import { FaPhone, FaPhoneSlash, FaPlay } from 'react-icons/fa6';
 import {
   Dialog,
   DialogHeader,
@@ -74,6 +73,10 @@ export default function ConversationPage() {
         setIsProcessing(true);
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
         const response = await startRecording(audioBlob);
+        if (!response.text) {
+          setIsProcessing(false);
+          return;
+        }
 
         addConversation('user', response.text);
         if (answerCount + 1 === ANSWER_COUNT) {
@@ -129,7 +132,7 @@ export default function ConversationPage() {
   return (
     <div className="relative flex w-full flex-grow flex-col pb-20">
       <Progress
-        className="h-2 rounded-none [&>div]:bg-blue-500"
+        className="sticky top-0 z-10 h-2 rounded-none [&>div]:bg-blue-500"
         value={(answerCount / ANSWER_COUNT) * 100}
       />
       <h1 className="mb-4 py-4 text-center text-2xl font-bold">Lesson</h1>
@@ -154,10 +157,10 @@ export default function ConversationPage() {
                 </div>
                 <div
                   className={cn(
-                    'space-y-2 rounded-t-2xl border p-4 whitespace-pre-wrap',
+                    'min-w-20 space-y-2 rounded-t-2xl border p-4 whitespace-pre-wrap',
                     message.role === 'ai'
-                      ? 'w-fit rounded-br-2xl text-left'
-                      : 'ml-auto w-fit rounded-bl-2xl text-right',
+                      ? 'w-fit rounded-br-2xl'
+                      : 'ml-auto w-fit rounded-bl-2xl',
                   )}
                 >
                   <p>{message.content}</p>
@@ -181,7 +184,7 @@ export default function ConversationPage() {
                         size="icon"
                         onClick={() => handleReplyAudio(message.content)}
                       >
-                        <FaPlay className="fill-white pl-1" />
+                        <FaPlay className="fill-background pl-1" />
                       </Button>
                     </div>
                   )}
@@ -195,6 +198,7 @@ export default function ConversationPage() {
               size="lg"
               onClick={handleStartTest}
               disabled={isTestStarted}
+              className="size-50 rounded-full bg-radial-[at_25%_25%] from-sky-200 to-sky-900 to-75% text-3xl font-bold"
             >
               スタート
             </Button>
@@ -204,24 +208,28 @@ export default function ConversationPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 flex w-full justify-center space-x-4 border-t p-4">
-        <Button
-          type="button"
-          onClick={isRecording ? handleStopRecording : handleStartRecording}
-          variant={isRecording ? 'destructive' : 'default'}
-          disabled={!isTestStarted || isProcessing}
-          className={cn(
-            'rounded px-4 py-2',
-            isProcessing ? 'cursor-not-allowed opacity-50' : '',
-          )}
-        >
-          {isRecording && <BsFillMicFill />}
-          {isProcessing
-            ? 'Processing...'
-            : isRecording
-              ? 'Stop Recording'
-              : 'Start Recording'}
-        </Button>
+      <div className="fixed bottom-0 left-0 w-full">
+        <div className="mx-auto flex max-w-xl justify-end p-4">
+          <Button
+            type="button"
+            size="lg"
+            onClick={isRecording ? handleStopRecording : handleStartRecording}
+            variant={isRecording ? 'destructive' : 'default'}
+            disabled={!isTestStarted || isProcessing}
+            className={cn(
+              'rounded-full px-4 py-2',
+              isProcessing ? 'cursor-not-allowed opacity-50' : '',
+            )}
+          >
+            {!isProcessing && isRecording && <FaPhoneSlash />}
+            {!isProcessing && !isRecording && <FaPhone />}
+            {isProcessing
+              ? 'Processing...'
+              : isRecording
+                ? 'Stop Recording'
+                : 'Start Recording'}
+          </Button>
+        </div>
       </div>
       <Dialog
         open={answerCount === ANSWER_COUNT}

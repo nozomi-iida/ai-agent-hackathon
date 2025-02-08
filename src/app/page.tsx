@@ -36,7 +36,6 @@ export default function ConversationPage() {
   const [isTestStarted, setIsTestStarted] = useState(false);
   const [result, setResult] = useState('');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  let stream;
 
   const playAudio = async (content: string) => {
     const audioContext = new AudioContext();

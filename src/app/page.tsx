@@ -22,7 +22,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 
-const ANSWER_COUNT = 2;
+const ANSWER_COUNT = 10;
 
 export default function ConversationPage() {
   const [isRecording, setIsRecording] = useState(false);

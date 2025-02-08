@@ -36,6 +36,7 @@ export default function ConversationPage() {
   const [isTestStarted, setIsTestStarted] = useState(false);
   const [result, setResult] = useState('');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  let stream;
 
   const playAudio = async (content: string) => {
     const audioContext = new AudioContext();
@@ -70,6 +71,7 @@ export default function ConversationPage() {
       };
 
       mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
         setIsProcessing(true);
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
         const response = await startRecording(audioBlob);
